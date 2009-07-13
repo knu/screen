@@ -2599,7 +2599,14 @@ int from, to, y;
 #ifdef DW_CHARS
       if (dw_right(ml, x, D_encoding))
 	{
-	  x--;
+	  if (x>0)
+	    {
+	      x--;
+	    }
+	  else
+	    {
+	      x++;
+	    }
 	  debug1("DisplayLine on right side of dw char- x now %d\n", x);
 	  GotoPos(x, y);
 	}
