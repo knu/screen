@@ -409,9 +409,14 @@ struct win *wi;
   register slot_t slot;
   struct utmp u;
   int saved_ut;
+#define DISABLE_HOST_CHOPPING 1 /* disabled due to lack of IPv6 address support */
 #ifdef UTHOST
+# ifdef DISABLE_HOST_CHOPPING
+#  define host D_loginhost
+# else
   char *p;
   char host[sizeof(D_loginhost) + 15];
+# endif
 #else
   char *host = 0;
 #endif /* UTHOST */
@@ -435,6 +440,7 @@ struct win *wi;
     makeuser(&u, stripdev(wi->w_tty), LoginName, wi->w_pid);
 
 #ifdef UTHOST
+#ifndef DISABLE_HOST_CHOPPING
   host[sizeof(host) - 15] = '\0';
   if (display)
     {
@@ -473,6 +479,7 @@ struct win *wi;
 
   sprintf(host + strlen(host), ":S.%d", wi->w_number);
   debug1("rlogin hostname: '%s'\n", host);
+#endif
 
 # if !defined(_SEQUENT_) && !defined(sequent)
   strncpy(u.ut_host, host, sizeof(u.ut_host));
@@ -490,6 +497,9 @@ struct win *wi;
   bcopy((char *)&u, (char *)&wi->w_savut, sizeof(u));
   UT_CLOSE;
   return 0;
+#ifdef DISABLE_HOST_CHOPPING
+# undef host
+#endif
 }
 
 /*
