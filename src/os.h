@@ -156,7 +156,7 @@ extern int errno;
 # define setregid(rgid, egid) setresgid(rgid, egid, -1)
 #endif
 
-#if defined(HAVE_SETEUID) || defined(HAVE_SETREUID) || defined(HAVE_SETRESUID)
+#if (defined(HAVE_SETEUID) || defined(HAVE_SETREUID) || defined(HAVE_SETRESUID)) && __FreeBSD_version < 500000
 # define USE_SETEUID
 #endif
 
@@ -252,7 +252,11 @@ extern int errno;
 #if defined(UTMPOK) || defined(BUGGYGETLOGIN)
 # if defined(SVR4) && !defined(DGUX) && !defined(__hpux) && !defined(linux)
 #  include <utmpx.h>
-#  define UTMPFILE	UTMPX_FILE
+#  ifdef UTMPX_FILE
+#   define UTMPFILE	UTMPX_FILE
+#  else
+#   define UTMPFILE	"/nonexistent"
+#  endif
 #  define utmp		utmpx
 #  define getutent	getutxent
 #  define getutid	getutxid
@@ -260,7 +264,7 @@ extern int errno;
 #  define pututline	pututxline
 #  define setutent	setutxent
 #  define endutent	endutxent
-#  define ut_time	ut_xtime
+#  define ut_time	ut_tv.tv_sec
 # else /* SVR4 */
 #  include <utmp.h>
 # endif /* SVR4 */
