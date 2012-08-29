@@ -712,6 +712,16 @@ AC_CHECK_FUNCS(openpty,,
 fi
 
 AC_CHECKING(for ptyranges)
+AC_EGREP_CPP(yes,
+[#ifdef __FreeBSD__
+   yes;
+#endif
+], FREEBSD=1)
+if test -n "$FREEBSD" ; then
+# XXX: hardcoded to be devfs and various setups independent
+AC_DEFINE_UNQUOTED(PTYRANGE0,"pqrsPQRSlmnoLMNO")
+AC_DEFINE_UNQUOTED(PTYRANGE1,"0123456789abcdefghijklmnopqrstuv")
+else
 if test -d /dev/ptym ; then
 pdir='/dev/ptym'
 else
@@ -733,6 +743,7 @@ p0=`echo $ptys | tr ' ' '\012' | sed -e 's/^.*\(.\).$/\1/g' | sort -u | tr -d '\
 p1=`echo $ptys | tr ' ' '\012' | sed -e 's/^.*\(.\)$/\1/g'  | sort -u | tr -d '\012'`
 AC_DEFINE_UNQUOTED(PTYRANGE0,"$p0")
 AC_DEFINE_UNQUOTED(PTYRANGE1,"$p1")
+fi
 fi
 
 dnl    ****  pty mode/group handling ****
